@@ -2,6 +2,10 @@
 
 **Monitoramento e Compliance ESG para Cadeias Produtivas da Amazônia**
 
+<div align="center">
+  <img src="NorteDue.png"/>
+</div>
+
 ## 📖 Descrição do Projeto
 A **NorteDue** é uma solução B2B desenvolvida para automatizar a diligência prévia (*Due Diligence*) e o monitoramento contínuo de fornecedores. Focada inicialmente nos setores madeireiro, pecuário e extrativista do estado do Acre, a plataforma cruza dados de bases públicas (ambientais, jurídicas e trabalhistas) para mitigar riscos financeiros e de reputação para empresas compradoras. O objetivo é garantir cadeias de suprimentos limpas, livres de passivos ambientais e em conformidade com as exigências globais de ESG.
 
