@@ -1,0 +1,37 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>NorteDue - Entrar</title>
+    <link rel="stylesheet" href="{% static 'core/css/dashboard.css' %}">
+</head>
+<body style="align-items: center; justify-content: center;">
+    <div class="card" style="width: 380px;">
+        <h2 style="margin-bottom: 20px;">Entrar no NorteDue</h2>
+        
+        <form method="POST">
+            {% csrf_token %}
+
+            {% if form.errors %}
+                <ul class="errorlist">
+                    {% for error in form.non_field_errors %}
+                        <li>{{ error }}</li>
+                    {% endfor %}
+                    {% for field in form %}
+                        {% for error in field.errors %}
+                            <li>{{ error }}</li>
+                        {% endfor %}
+                    {% endfor %}
+                </ul>
+            {% endif %}
+
+            {{ form.as_p }}
+            <button type="submit" style="width: 100%; margin-top: 16px;">Acessar Dashboard</button>
+        </form>
+        <p style="margin-top: 16px; color: var(--text-muted); font-size: 0.9rem;">
+            Não tem uma conta? <a href="{% url 'register' %}" style="color: var(--accent-green);">Cadastre-se</a>
+        </p>
+    </div>
+</body>
+</html>

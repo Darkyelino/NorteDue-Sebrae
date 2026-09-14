@@ -1,39 +1,81 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
-    <title>NorteDue - Compliance & ESG</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NorteDue</title>
+    <!-- CSS Próprio -->
+    <link rel="stylesheet" href="{% static 'core/css/dashboard.css' %}">
+    <!-- Chart.js CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
-    <h1>NorteDue - Painel de Controle</h1>
-    
-    <!-- Menu / Navegação -->
-    <nav>
-        <a href="#">Dashboard</a> | 
-        <a href="#">Editar Dashboard</a> | 
-        <a href="#">Sair (Exit)</a>
-    </nav>
-    <hr>
 
-    <!-- Formulário de Pesquisa de CNPJ -->
-    <section>
-        <h2>Consulta de Fornecedores</h2>
-        <form>
-            <label for="cnpj">CNPJ do Fornecedor:</label>
-            <input type="text" id="cnpj" name="cnpj" placeholder="00.000.000/0000-00">
-            <button type="button">Buscar</button>
-        </form>
-    </section>
-    <hr>
+    <!-- Sidebar Navegação -->
+    <aside class="sidebar">
+        <div class="brand">NorteDue</div>
+        <ul class="nav-links">
+            <li><a href="#" class="active">Dashboard</a></li>
+            <li><a href="#">Fornecedores</a></li>
+            <li><a href="#">Relatórios</a></li>
+            <li><a href="{% url 'logout' %}">Sair</a></li>
+        </ul>
+    </aside>
 
-    <!-- Exibição dos Dados da Entidade Suppliers -->
-    <section>
-        <h2>Dossiê de Riscos (Suppliers)</h2>
-        <p><strong>CNPJ:</strong> --</p>
-        <p><strong>Processos Ativos:</strong> --</p>
-        <p><strong>Risco Trabalhista:</strong> --</p>
-        <p><strong>Situação Ambiental:</strong> --</p>
-        <p><strong>Score NorteDue:</strong> --</p>
-    </section>
+    <!-- Conteúdo Principal -->
+    <main class="main-content">
+        
+        <!-- Formulário de Busca -->
+        <section class="card">
+            <h2>Consultar Fornecedor</h2>
+            <form method="POST" class="search-form">
+                {% csrf_token %}
+                <input type="text" name="cnpj" placeholder="Informe o CNPJ do fornecedor..." required>
+                <button type="submit">Analisar Risco</button>
+            </form>
+            {% if error %}
+                <p style="color: var(--accent-red); margin-top: 12px;">{{ error }}</p>
+            {% endif %}
+        </section>
+
+        <!-- Grid do Painel -->
+        <div class="dashboard-grid">
+            
+            <!-- Dossiê do CNPJ Pesquisado -->
+            <section class="card">
+                <h2>Dossiê de Compliance</h2>
+                {% if supplier %}
+                    <div style="margin-top: 16px; display: flex; flex-direction: column; gap: 12px;">
+                        <p><strong>Razão Social:</strong> {{ razao_social|default:"--" }}</p>
+                        <p><strong>CNAE:</strong> {{ cnae|default:"--" }}</p>
+                        <p><strong>CNPJ:</strong> {{ supplier.cnpj }}</p>
+                        <p><strong>Processos Ativos:</strong> {{ supplier.active_processes }}</p>
+                        <p><strong>Situação Ambiental:</strong> {{ supplier.environmental_situation }}</p>
+                        <p>
+                            <strong>Score NorteDue:</strong> 
+                            <span class="metric-badge {% if supplier.score_nortedue >= 70 %}badge-success{% else %}badge-danger{% endif %}">
+                                {{ supplier.score_nortedue }}/100
+                            </span>
+                        </p>
+                    </div>
+                {% else %}
+                    <p style="color: var(--text-muted); margin-top: 16px;">Realize uma busca para carregar as métricas ESG.</p>
+                {% endif %}
+            </section>
+
+            <!-- Gráfico de Visão Geral -->
+            <section class="card">
+                <h2>Distribuição de Riscos da Carteira</h2>
+                <div class="chart-container">
+                    <canvas id="riskChart"></canvas>
+                </div>
+            </section>
+
+        </div>
+    </main>
+
+    <!-- JS Próprio -->
+    <script src="{% static 'core/js/dashboard.js' %}"></script>
 </body>
 </html>
