@@ -4,34 +4,28 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NorteDue</title>
-    <!-- CSS Próprio -->
+    <title>NorteDue - Dashboard</title>
     <link rel="stylesheet" href="{% static 'core/css/dashboard.css' %}">
-    <!-- Chart.js CDN -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
 
-    <!-- Sidebar Navegação -->
     <aside class="sidebar">
         <div class="brand">NorteDue</div>
         <ul class="nav-links">
-            <li><a href="#" class="active">Dashboard</a></li>
-            <li><a href="#">Fornecedores</a></li>
-            <li><a href="#">Relatórios</a></li>
+            <li><a href="{% url 'dashboard' %}" class="active">Dashboard</a></li>
+            <li><a href="{% url 'suppliers_list' %}">Fornecedores</a></li>
             <li><a href="{% url 'logout' %}">Sair</a></li>
         </ul>
     </aside>
 
-    <!-- Conteúdo Principal -->
     <main class="main-content">
-        
         <!-- Formulário de Busca -->
         <section class="card">
             <h2>Consultar Fornecedor</h2>
             <form method="POST" class="search-form">
                 {% csrf_token %}
-                <input type="text" name="cnpj" placeholder="Informe o CNPJ do fornecedor..." required>
+                <input type="text" name="cnpj" placeholder="Digite o CNPJ (ex: 04.065.033/0001-70)" required>
                 <button type="submit">Analisar Risco</button>
             </form>
             {% if error %}
@@ -39,43 +33,55 @@
             {% endif %}
         </section>
 
-        <!-- Grid do Painel -->
         <div class="dashboard-grid">
-            
-            <!-- Dossiê do CNPJ Pesquisado -->
+            <!-- Dossiê com as novas variáveis -->
             <section class="card">
-                <h2>Dossiê de Compliance</h2>
-                {% if supplier %}
+                <h2>Dossiê de Riscos</h2>
+                {% if searched_data %}
                     <div style="margin-top: 16px; display: flex; flex-direction: column; gap: 12px;">
-                        <p><strong>Razão Social:</strong> {{ razao_social|default:"--" }}</p>
-                        <p><strong>CNAE:</strong> {{ cnae|default:"--" }}</p>
-                        <p><strong>CNPJ:</strong> {{ supplier.cnpj }}</p>
-                        <p><strong>Processos Ativos:</strong> {{ supplier.active_processes }}</p>
-                        <p><strong>Situação Ambiental:</strong> {{ supplier.environmental_situation }}</p>
+                        <p><strong>Razão Social:</strong> {{ searched_data.razao_social|default:"--" }}</p>
+                        <p><strong>CNAE:</strong> {{ searched_data.cnae|default:"--" }}</p>
+                        <p><strong>CNPJ:</strong> {{ searched_data.cnpj }}</p>
+                        <p><strong>Processos Ativos:</strong> {{ searched_data.active_processes }}</p>
+                        <p><strong>Situação Ambiental:</strong> {{ searched_data.environmental_situation }}</p>
                         <p>
                             <strong>Score NorteDue:</strong> 
-                            <span class="metric-badge {% if supplier.score_nortedue >= 70 %}badge-success{% else %}badge-danger{% endif %}">
-                                {{ supplier.score_nortedue }}/100
+                            <span class="metric-badge {% if searched_data.score_nortedue >= 70 %}badge-success{% else %}badge-danger{% endif %}">
+                                {{ searched_data.score_nortedue }}/100
                             </span>
                         </p>
+
+                        <!-- Form do Botão Adicionar/Remover -->
+                        <form method="POST" action="{% url 'toggle_monitor' %}">
+                            {% csrf_token %}
+                            <input type="hidden" name="cnpj" value="{{ searched_data.cnpj }}">
+                            <input type="hidden" name="active_processes" value="{{ searched_data.active_processes }}">
+                            <input type="hidden" name="labor_risk" value="{{ searched_data.labor_risk }}">
+                            <input type="hidden" name="environmental_situation" value="{{ searched_data.environmental_situation }}">
+                            <input type="hidden" name="score_nortedue" value="{{ searched_data.score_nortedue }}">
+
+                            {% if searched_data.is_monitored %}
+                                <button type="submit" class="btn-monitored">✓ Monitorando (Clique para remover)</button>
+                            {% else %}
+                                <button type="submit" class="btn-monitor">+ Adicionar à Lista de Monitoramento</button>
+                            {% endif %}
+                        </form>
                     </div>
                 {% else %}
-                    <p style="color: var(--text-muted); margin-top: 16px;">Realize uma busca para carregar as métricas ESG.</p>
+                    <p style="color: var(--text-muted); margin-top: 16px;">Consulte um CNPJ para visualizar o relatório e adicionar ao monitoramento.</p>
                 {% endif %}
             </section>
 
-            <!-- Gráfico de Visão Geral -->
+            <!-- Gráfico Visão Geral -->
             <section class="card">
-                <h2>Distribuição de Riscos da Carteira</h2>
+                <h2>Distribuição de Risco da Carteira</h2>
                 <div class="chart-container">
                     <canvas id="riskChart"></canvas>
                 </div>
             </section>
-
         </div>
     </main>
 
-    <!-- JS Próprio -->
     <script src="{% static 'core/js/dashboard.js' %}"></script>
 </body>
 </html>
