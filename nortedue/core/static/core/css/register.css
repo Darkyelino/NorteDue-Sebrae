@@ -1,0 +1,179 @@
+/* Customizações exclusivas para a tela de registro */
+.register-body {
+    background: radial-gradient(circle at 50% 20%, #1e293b 0%, #0f172a 70%);
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px 20px;
+}
+
+.register-card {
+    background-color: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: 16px;
+    padding: 40px 32px;
+    width: 100%;
+    max-width: 460px; /* Um pouco mais largo para acomodar textos de ajuda */
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.4), 0 8px 10px -6px rgba(0, 0, 0, 0.3);
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
+
+.register-header {
+    text-align: center;
+}
+
+.register-header .brand {
+    font-size: 1.8rem;
+    font-weight: 800;
+    color: var(--accent-green);
+    letter-spacing: -0.5px;
+    margin-bottom: 8px;
+}
+
+.register-header h2 {
+    font-size: 1.25rem;
+    color: var(--text-primary);
+    font-weight: 600;
+}
+
+.register-header p {
+    color: var(--text-muted);
+    font-size: 0.875rem;
+    margin-top: 4px;
+}
+
+/* Formulário e Grupos de Input */
+.register-form {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.form-group label {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+.input-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.input-wrapper input {
+    width: 100%;
+    background-color: var(--bg-main);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 12px 16px;
+    padding-right: 42px; /* Espaço para o ícone de olho */
+    color: var(--text-primary);
+    font-size: 0.95rem;
+    outline: none;
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.input-wrapper input:focus {
+    border-color: var(--accent-green);
+    box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.15);
+}
+
+/* Texto auxiliar de requisitos da senha */
+.help-text {
+    font-size: 0.78rem;
+    color: var(--text-muted);
+    line-height: 1.3;
+}
+
+/* Botão de alternar visibilidade da senha */
+.toggle-password {
+    position: absolute;
+    right: 12px;
+    background: none;
+    border: none;
+    color: var(--text-muted);
+    cursor: pointer;
+    padding: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: color 0.2s;
+}
+
+.toggle-password:hover {
+    color: var(--text-primary);
+}
+
+/* Botão Principal de Cadastro */
+.btn-submit {
+    background-color: var(--accent-green);
+    color: #022c22;
+    font-size: 1rem;
+    font-weight: 700;
+    border: none;
+    border-radius: 8px;
+    padding: 14px;
+    cursor: pointer;
+    transition: transform 0.1s, opacity 0.2s;
+    margin-top: 8px;
+}
+
+.btn-submit:hover {
+    opacity: 0.95;
+    transform: translateY(-1px);
+}
+
+.btn-submit:active {
+    transform: translateY(0);
+}
+
+.btn-submit:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+/* Caixa de Erros */
+.register-error-container {
+    background-color: rgba(239, 68, 68, 0.1);
+    border: 1px solid var(--accent-red);
+    border-radius: 8px;
+    padding: 12px 16px;
+}
+
+.register-error-container ul {
+    list-style: none;
+    color: var(--accent-red);
+    font-size: 0.85rem;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+/* Rodapé do Card */
+.register-footer {
+    text-align: center;
+    font-size: 0.875rem;
+    color: var(--text-muted);
+    border-top: 1px solid var(--border-color);
+    padding-top: 18px;
+}
+
+.register-footer a {
+    color: var(--accent-green);
+    text-decoration: none;
+    font-weight: 600;
+}
+
+.register-footer a:hover {
+    text-decoration: underline;
+}
