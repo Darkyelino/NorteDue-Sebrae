@@ -76,7 +76,13 @@
             <section class="card">
                 <h2>Distribuição de Risco da Carteira</h2>
                 <div class="chart-container">
-                    <canvas id="riskChart"></canvas>
+                    <canvas 
+                        id="riskChart" 
+                        data-low="{{ low_risk_count }}" 
+                        data-medium="{{ medium_risk_count }}" 
+                        data-high="{{ high_risk_count }}"
+                        data-total="{{ total_monitored }}">
+                    </canvas>
                 </div>
             </section>
         </div>

@@ -44,6 +44,8 @@ def logout_view(request):
 @login_required(login_url='login')
 def dashboard(request):
     context = {}
+
+    # 1. Processa a busca por CNPJ, se enviada
     if request.method == 'POST':
         raw_cnpj = request.POST.get('cnpj', '')
         cnpj_limpo = re.sub(r'\D', '', str(raw_cnpj))
@@ -51,7 +53,6 @@ def dashboard(request):
         if cnpj_limpo:
             dados = consultar_fornecedor_real(cnpj_limpo)
             if dados:
-                # Verifica se o CNPJ já existe no banco e se o usuário atual o monitora
                 supplier_obj = Supplier.objects.filter(cnpj=cnpj_limpo).first()
                 is_monitored = False
                 if supplier_obj and supplier_obj.monitored_by.filter(id=request.user.id).exists():
@@ -72,8 +73,15 @@ def dashboard(request):
         else:
             context['error'] = "Por favor, informe um CNPJ válido."
 
-    return render(request, 'dashboard.html', context)
+    # 2. Busca a carteira de fornecedores do usuário logado para o gráfico
+    monitored_suppliers = request.user.monitored_suppliers.all()
+    
+    context['low_risk_count'] = monitored_suppliers.filter(score_nortedue__gte=70).count()
+    context['medium_risk_count'] = monitored_suppliers.filter(score_nortedue__gte=50, score_nortedue__lt=70).count()
+    context['high_risk_count'] = monitored_suppliers.filter(score_nortedue__lt=50).count()
+    context['total_monitored'] = monitored_suppliers.count()
 
+    return render(request, 'dashboard.html', context)
 
 @login_required(login_url='login')
 def toggle_monitor(request):
