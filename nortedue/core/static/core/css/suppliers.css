@@ -146,3 +146,21 @@
     padding: 48px 20px;
     color: var(--text-muted);
 }
+
+.btn-detail {
+    display: inline-block;
+    padding: 6px 14px;
+    background-color: rgba(59, 130, 246, 0.15);
+    color: var(--accent-blue);
+    border: 1px solid rgba(59, 130, 246, 0.3);
+    border-radius: 6px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    text-decoration: none;
+    transition: all 0.2s ease;
+}
+
+.btn-detail:hover {
+    background-color: var(--accent-blue);
+    color: #ffffff;
+}

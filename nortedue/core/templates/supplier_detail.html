@@ -1,0 +1,102 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NorteDue - Dossiê de {{ supplier.razao_social }}</title>
+    <link rel="stylesheet" href="{% static 'core/css/dashboard.css' %}">
+    <link rel="stylesheet" href="{% static 'core/css/suppliers.css' %}">
+</head>
+<body>
+
+    <aside class="sidebar">
+        <div class="brand">NorteDue</div>
+        <ul class="nav-links">
+            <li><a href="{% url 'dashboard' %}">Dashboard</a></li>
+            <li><a href="{% url 'suppliers_list' %}" class="active">Fornecedores</a></li>
+            <li><a href="{% url 'logout' %}">Sair</a></li>
+        </ul>
+    </aside>
+
+    <main class="main-content">
+        <!-- Cabeçalho do Dossiê -->
+        <div class="page-header" style="flex-direction: column; align-items: flex-start; gap: 8px;">
+            <a href="{% url 'suppliers_list' %}" style="color: var(--accent-green); text-decoration: none; font-size: 0.875rem;">← Voltar para a Carteira</a>
+            <h1>{{ supplier.razao_social|default:"Dossiê de Riscos" }}</h1>
+            <p>CNPJ: <span class="cnpj-code">{{ supplier.cnpj }}</span> | Situação Cadastral: <strong>{{ supplier.situacao_cadastral }}</strong></p>
+        </div>
+
+        <div class="dashboard-grid">
+            <!-- Dados Cadastrais e Societários -->
+            <section class="card">
+                <h2>Informações Cadastrais</h2>
+                <div style="margin-top: 16px; display: flex; flex-direction: column; gap: 10px;">
+                    <p><strong>Nome Fantasia:</strong> {{ supplier.nome_fantasia|default:"--" }}</p>
+                    <p><strong>CNAE Principal:</strong> {{ supplier.cnae_principal|default:"--" }}</p>
+                    <p><strong>Localização:</strong> {{ supplier.municipio }} - {{ supplier.uf }}</p>
+                    <p>
+                        <strong>Score NorteDue:</strong> 
+                        <span class="metric-badge {% if supplier.score_nortedue >= 70 %}badge-success{% else %}badge-danger{% endif %}">
+                            {{ supplier.score_nortedue }}/100
+                        </span>
+                    </p>
+                </div>
+
+                {% if qsa %}
+                    <h3 style="font-size: 1rem; margin-top: 20px; color: var(--text-muted);">Quadro de Sócios e Administradores (QSA)</h3>
+                    <ul style="margin-top: 8px; padding-left: 20px; color: var(--text-main);">
+                        {% for socio in qsa %}
+                            <li>{{ socio.nome_socio }} ({{ socio.qualificacao_socio }})</li>
+                        {% endfor %}
+                    </ul>
+                {% endif %}
+            </section>
+
+            <!-- Status de Compliance -->
+            <section class="card">
+                <h2>Indicadores de Compliance & ESG</h2>
+                <div style="margin-top: 16px; display: flex; flex-direction: column; gap: 12px;">
+                    <p><strong>Situação Ambiental (IMAC/IBAMA):</strong> {{ supplier.environmental_situation }}</p>
+                    <p><strong>Risco Trabalhista:</strong> {{ supplier.labor_risk }}</p>
+                    <p><strong>Total de Processos Mapeados:</strong> {{ supplier.active_processes }}</p>
+                </div>
+            </section>
+        </div>
+
+        <!-- Tabela Detalhada de Processos Judiciais -->
+        <section class="card" style="margin-top: 24px;">
+            <h2>Detalhamento dos Processos Mapeados</h2>
+            <div style="margin-top: 16px;">
+                {% if processes_list %}
+                    <table class="suppliers-table">
+                        <thead>
+                            <tr>
+                                <th>Número do Processo</th>
+                                <th>Tribunal</th>
+                                <th>Tipo</th>
+                                <th>Assunto / Classe</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for p in processes_list %}
+                                <tr>
+                                    <td class="cnpj-code">{{ p.numero_processo }}</td>
+                                    <td>{{ p.tribunal }}</td>
+                                    <td>{{ p.tipo }}</td>
+                                    <td>{{ p.assunto }}</td>
+                                    <td><span class="badge-risk badge-high">{{ p.status }}</span></td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                {% else %}
+                    <p style="color: var(--text-muted); padding: 12px 0;">Nenhum processo judicial ou autuação ativa identificada para este CNPJ nas bases de dados consultadas.</p>
+                {% endif %}
+            </div>
+        </section>
+    </main>
+
+</body>
+</html>
