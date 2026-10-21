@@ -58,7 +58,6 @@
                         <tr>
                             <th>Empresa / Razão Social</th>
                             <th>CNPJ</th>
-                            <th>UF / Cidade</th>
                             <th>Risco Trabalhista</th>
                             <th>Score NorteDue</th>
                             <th style="text-align: center;">Ações</th>
@@ -69,14 +68,13 @@
                             <tr>
                                 <td>
                                     <strong style="font-size: 0.95rem; color: #f8fafc;">
-                                        {{ s.razao_social|default:"Razão Social Não Informada" }}
+                                        {{ s.razao_social|default:"Nome não informado" }}
                                     </strong>
                                     {% if s.nome_fantasia %}
                                         <div style="font-size: 0.8rem; color: var(--text-muted);">{{ s.nome_fantasia }}</div>
                                     {% endif %}
                                 </td>
                                 <td class="cnpj-code">{{ s.cnpj }}</td>
-                                <td>{{ s.municipio }}/{{ s.uf }}</td>
                                 <td>
                                     <span class="badge-risk {% if s.labor_risk == 'Baixo' %}badge-low{% elif s.labor_risk == 'Médio' %}badge-medium{% else %}badge-high{% endif %}">
                                         {{ s.labor_risk }}
@@ -88,7 +86,7 @@
                                     </span>
                                 </td>
                                 <td style="text-align: center;">
-                                    <a href="{% url 'supplier_detail' s.id %}" class="btn-detail">
+                                    <a href="{% url 'supplier_detail' s.id %}" style="display: inline-block; padding: 6px 14px; background-color: rgba(59, 130, 246, 0.15); color: #3b82f6; border-radius: 6px; font-weight: 600; text-decoration: none;">
                                         Ver Dossiê
                                     </a>
                                 </td>

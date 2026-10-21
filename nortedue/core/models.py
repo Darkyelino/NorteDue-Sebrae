@@ -21,14 +21,14 @@ class Supplier(models.Model):
     def __str__(self):
         return f"{self.razao_social or self.cnpj} ({self.cnpj})"
 
+# Nova tabela para salvar os processos reais
 class SupplierProcess(models.Model):
     supplier = models.ForeignKey(Supplier, related_name='processes', on_delete=models.CASCADE)
     numero_processo = models.CharField(max_length=100)
-    tribunal = models.CharField(max_length=100)  # Ex: TRT14 (AC/RO), TJAC, TRF1
-    tipo = models.CharField(max_length=50)       # Ex: Trabalhista, Ambiental, Cível
+    tribunal = models.CharField(max_length=100)
+    tipo = models.CharField(max_length=50)
     assunto = models.TextField(blank=True, null=True)
-    data_distribuicao = models.CharField(max_length=20, blank=True, null=True)
-    status = models.CharField(max_length=50, default='Em Andamento')
+    status = models.CharField(max_length=50, default='Mapeado')
 
     def __str__(self):
         return f"{self.numero_processo} - {self.tribunal}"

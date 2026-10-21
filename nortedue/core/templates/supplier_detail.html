@@ -4,12 +4,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NorteDue - Dossiê de {{ supplier.razao_social }}</title>
+    <title>NorteDue - Dossiê: {{ supplier.razao_social }}</title>
+    
     <link rel="stylesheet" href="{% static 'core/css/dashboard.css' %}">
     <link rel="stylesheet" href="{% static 'core/css/suppliers.css' %}">
 </head>
 <body>
 
+    <!-- Sidebar Navegação -->
     <aside class="sidebar">
         <div class="brand">NorteDue</div>
         <ul class="nav-links">
@@ -20,82 +22,169 @@
     </aside>
 
     <main class="main-content">
-        <!-- Cabeçalho do Dossiê -->
+        
+        <!-- Cabeçalho Principal do Dossiê -->
         <div class="page-header" style="flex-direction: column; align-items: flex-start; gap: 8px;">
-            <a href="{% url 'suppliers_list' %}" style="color: var(--accent-green); text-decoration: none; font-size: 0.875rem;">← Voltar para a Carteira</a>
-            <h1>{{ supplier.razao_social|default:"Dossiê de Riscos" }}</h1>
-            <p>CNPJ: <span class="cnpj-code">{{ supplier.cnpj }}</span> | Situação Cadastral: <strong>{{ supplier.situacao_cadastral }}</strong></p>
-        </div>
-
-        <div class="dashboard-grid">
-            <!-- Dados Cadastrais e Societários -->
-            <section class="card">
-                <h2>Informações Cadastrais</h2>
-                <div style="margin-top: 16px; display: flex; flex-direction: column; gap: 10px;">
-                    <p><strong>Nome Fantasia:</strong> {{ supplier.nome_fantasia|default:"--" }}</p>
-                    <p><strong>CNAE Principal:</strong> {{ supplier.cnae_principal|default:"--" }}</p>
-                    <p><strong>Localização:</strong> {{ supplier.municipio }} - {{ supplier.uf }}</p>
-                    <p>
-                        <strong>Score NorteDue:</strong> 
-                        <span class="metric-badge {% if supplier.score_nortedue >= 70 %}badge-success{% else %}badge-danger{% endif %}">
-                            {{ supplier.score_nortedue }}/100
-                        </span>
+            <a href="{% url 'suppliers_list' %}" style="color: var(--accent-green); text-decoration: none; font-size: 0.875rem; font-weight: 600;">
+                ← Voltar para a Carteira de Fornecedores
+            </a>
+            <div style="display: flex; justify-content: space-between; width: 100%; align-items: center; margin-top: 8px;">
+                <div>
+                    <h1 style="font-size: 1.8rem; color: #f8fafc;">{{ supplier.razao_social|default:"Razão Social Não Informada" }}</h1>
+                    {% if supplier.nome_fantasia and supplier.nome_fantasia != supplier.razao_social %}
+                        <p style="color: var(--accent-green); font-size: 1rem; font-weight: 500;">Nome Fantasia: {{ supplier.nome_fantasia }}</p>
+                    {% endif %}
+                    <p style="color: var(--text-muted); font-size: 0.9rem; margin-top: 4px;">
+                        CNPJ: <span class="cnpj-code">{{ supplier.cnpj }}</span> | 
+                        Situação Receita Federal: 
+                        <strong class="{% if supplier.situacao_cadastral == 'ATIVA' %}text-success{% else %}text-danger{% endif %}">
+                            {{ supplier.situacao_cadastral }}
+                        </strong>
                     </p>
                 </div>
-
-                {% if qsa %}
-                    <h3 style="font-size: 1rem; margin-top: 20px; color: var(--text-muted);">Quadro de Sócios e Administradores (QSA)</h3>
-                    <ul style="margin-top: 8px; padding-left: 20px; color: var(--text-main);">
-                        {% for socio in qsa %}
-                            <li>{{ socio.nome_socio }} ({{ socio.qualificacao_socio }})</li>
-                        {% endfor %}
-                    </ul>
-                {% endif %}
-            </section>
-
-            <!-- Status de Compliance -->
-            <section class="card">
-                <h2>Indicadores de Compliance & ESG</h2>
-                <div style="margin-top: 16px; display: flex; flex-direction: column; gap: 12px;">
-                    <p><strong>Situação Ambiental (IMAC/IBAMA):</strong> {{ supplier.environmental_situation }}</p>
-                    <p><strong>Risco Trabalhista:</strong> {{ supplier.labor_risk }}</p>
-                    <p><strong>Total de Processos Mapeados:</strong> {{ supplier.active_processes }}</p>
-                </div>
-            </section>
+            </div>
         </div>
 
-        <!-- Tabela Detalhada de Processos Judiciais -->
+        <!-- 1. BLOCO DE MÉTRICAS E INDICADORES DE RISCO (ESG & COMPLIANCE) -->
+        <div class="summary-cards" style="grid-template-columns: repeat(3, 1fr); margin-bottom: 24px;">
+            
+            <!-- Score NorteDue -->
+            <div class="summary-card">
+                <span>Score de Risco NorteDue</span>
+                <div style="display: flex; align-items: center; gap: 12px; margin-top: 8px;">
+                    <h3 class="score-display {% if supplier.score_nortedue >= 70 %}score-high{% elif supplier.score_nortedue >= 50 %}score-medium{% else %}score-low{% endif %}">
+                        {{ supplier.score_nortedue }}/100
+                    </h3>
+                </div>
+                <p style="font-size: 0.78rem; color: var(--text-muted); margin-top: 4px;">
+                    {% if supplier.score_nortedue >= 70 %}Baixo Risco Operacional{% elif supplier.score_nortedue >= 50 %}Atenção Requerida{% else %}Alto Risco de Passivo Legal/Ambiental{% endif %}
+                </p>
+            </div>
+
+            <!-- Situação Ambiental (IBAMA) -->
+            <div class="summary-card">
+                <span>Conformidade Ambiental (IBAMA / IMAC)</span>
+                <div style="margin-top: 8px;">
+                    <span class="badge-risk {% if 'Alerta' in supplier.environmental_situation or 'Irregular' in supplier.environmental_situation %}badge-high{% else %}badge-low{% endif %}" style="font-size: 0.95rem; padding: 6px 12px;">
+                        {{ supplier.environmental_situation }}
+                    </span>
+                </div>
+                <p style="font-size: 0.78rem; color: var(--text-muted); margin-top: 8px;">
+                    Consulta a embargos e autuações em dados abertos ambientais.
+                </p>
+            </div>
+
+            <!-- Risco Trabalhista e Sanções (CGU / MTE) -->
+            <div class="summary-card">
+                <span>Risco Trabalhista & Sanções (CGU / MTE)</span>
+                <div style="margin-top: 8px;">
+                    <span class="badge-risk {% if supplier.labor_risk == 'Baixo' %}badge-low{% elif 'Médio' in supplier.labor_risk %}badge-medium{% else %}badge-high{% endif %}" style="font-size: 0.95rem; padding: 6px 12px;">
+                        {{ supplier.labor_risk }}
+                    </span>
+                </div>
+                <p style="font-size: 0.78rem; color: var(--text-muted); margin-top: 8px;">
+                    Verificação no CEIS, CNEP e cadastros de inidoneidade.
+                </p>
+            </div>
+        </div>
+
+        <div class="dashboard-grid" style="grid-template-columns: 1fr 1fr; gap: 24px;">
+            
+            <!-- 2. INFORMAÇÕES CADASTRAIS DETALHADAS -->
+            <section class="card">
+                <h2>Dados Cadastrais & Localização</h2>
+                <div style="margin-top: 16px; display: flex; flex-direction: column; gap: 12px; font-size: 0.9rem;">
+                    <p><strong>Razão Social:</strong> <span style="color: var(--text-main);">{{ supplier.razao_social|default:"--" }}</span></p>
+                    <p><strong>Nome Fantasia:</strong> <span style="color: var(--text-main);">{{ supplier.nome_fantasia|default:"--" }}</span></p>
+                    <p><strong>CNPJ:</strong> <span class="cnpj-code">{{ supplier.cnpj }}</span></p>
+                    <p><strong>Atividade Econômica (CNAE):</strong> <span style="color: var(--text-main);">{{ supplier.cnae_principal|default:"Não Informado" }}</span></p>
+                    <p><strong>Município / UF:</strong> <span style="color: var(--text-main);">{{ supplier.municipio|default:"--" }} / {{ supplier.uf|default:"--" }}</span></p>
+                    <p><strong>Situação Cadastral:</strong> <span style="color: var(--text-main);">{{ supplier.situacao_cadastral }}</span></p>
+                </div>
+            </section>
+
+            <!-- 3. QUADRO DE SÓCIOS E ADMINISTRADORES (QSA) -->
+            <section class="card">
+                <h2>Quadro de Sócios e Administradores (QSA)</h2>
+                <div style="margin-top: 16px;">
+                    {% if qsa %}
+                        <div class="table-container" style="border: 1px solid var(--border-color); border-radius: 8px;">
+                            <table class="suppliers-table" style="font-size: 0.85rem;">
+                                <thead>
+                                    <tr>
+                                        <th>Nome do Sócio / Administrador</th>
+                                        <th>Qualificação / Cargo</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for socio in qsa %}
+                                        <tr>
+                                            <td style="font-weight: 600; color: #f8fafc;">{{ socio.nome_socio }}</td>
+                                            <td>{{ socio.qualificacao_socio }}</td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <p style="color: var(--text-muted); font-size: 0.875rem;">Nenhum sócio ou administrador listado publicamente para este CNPJ.</p>
+                    {% endif %}
+                </div>
+            </section>
+
+        </div>
+
+        <!-- 4. TABELA COMPLETA DE OCORRÊNCIAS, EMBARGOS E PROCESSOS MAPEADOS -->
         <section class="card" style="margin-top: 24px;">
-            <h2>Detalhamento dos Processos Mapeados</h2>
-            <div style="margin-top: 16px;">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <h2>Ocorrências, Embargos e Processos Mapeados ({{ supplier.active_processes }})</h2>
+            </div>
+            
+            <div class="table-container" style="margin-top: 16px;">
                 {% if processes_list %}
                     <table class="suppliers-table">
                         <thead>
                             <tr>
-                                <th>Número do Processo</th>
-                                <th>Tribunal</th>
-                                <th>Tipo</th>
-                                <th>Assunto / Classe</th>
-                                <th>Status</th>
+                                <th>Nº Termo / Processo</th>
+                                <th>Órgão / Tribunal</th>
+                                <th>Tipo de Risco</th>
+                                <th>Descrição da Infração / Assunto</th>
+                                <th>Situação</th>
                             </tr>
                         </thead>
                         <tbody>
                             {% for p in processes_list %}
                                 <tr>
                                     <td class="cnpj-code">{{ p.numero_processo }}</td>
-                                    <td>{{ p.tribunal }}</td>
-                                    <td>{{ p.tipo }}</td>
-                                    <td>{{ p.assunto }}</td>
-                                    <td><span class="badge-risk badge-high">{{ p.status }}</span></td>
+                                    <td><strong>{{ p.tribunal }}</strong></td>
+                                    <td>
+                                        <span class="badge-risk {% if p.tipo == 'Ambiental' %}badge-high{% elif p.tipo == 'Trabalhista' or p.tipo == 'Trabalhista / Administrativo' %}badge-medium{% else %}badge-low{% endif %}">
+                                            {{ p.tipo }}
+                                        </span>
+                                    </td>
+                                    <td style="max-width: 320px; line-height: 1.4;">{{ p.assunto|default:"Não especificado" }}</td>
+                                    <td>
+                                        <span class="badge-risk badge-high">
+                                            {{ p.status }}
+                                        </span>
+                                    </td>
                                 </tr>
                             {% endfor %}
                         </tbody>
                     </table>
                 {% else %}
-                    <p style="color: var(--text-muted); padding: 12px 0;">Nenhum processo judicial ou autuação ativa identificada para este CNPJ nas bases de dados consultadas.</p>
+                    <div class="empty-state" style="padding: 32px 20px;">
+                        <p style="color: var(--accent-green); font-weight: 600; font-size: 1rem;">
+                            ✓ Nenhuma ocorrência ou embargo ativo registrado.
+                        </p>
+                        <p style="font-size: 0.85rem; color: var(--text-muted); margin-top: 6px;">
+                            Não foram encontradas autuações no IBAMA, sanções no CEIS/CNEP ou pendências impeditivas nas bases de dados abertas do governo.
+                        </p>
+                    </div>
                 {% endif %}
             </div>
         </section>
+
     </main>
 
 </body>

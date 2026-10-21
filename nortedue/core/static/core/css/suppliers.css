@@ -164,3 +164,30 @@
     background-color: var(--accent-blue);
     color: #ffffff;
 }
+
+/* Classes Utilitárias de Texto */
+.text-success {
+    color: var(--accent-green);
+}
+
+.text-danger {
+    color: var(--accent-red);
+}
+
+/* Classes para Exibição do Score */
+.score-display {
+    font-size: 2.2rem;
+    font-weight: 700;
+}
+
+.score-high {
+    color: var(--accent-green);
+}
+
+.score-medium {
+    color: #f59e0b;
+}
+
+.score-low {
+    color: var(--accent-red);
+}
